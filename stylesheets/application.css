@@ -18,7 +18,8 @@ body {
   position: absolute;
 }
 
-.labels p {
+.labels p,
+.labels span {
   font: normal 10px "Consolas";
   color: #333333;
   position: absolute;

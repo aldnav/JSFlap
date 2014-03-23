@@ -27,7 +27,8 @@ NFAVisualizer.visualize = function(selector, nfa) {
     var state = SVG.create('circle', { cx: interval * i++, cy: height / 2, r: 12, label: label });
     states[label] = state;
     statesGroup.appendChild(state);
-    NFAVisualizer.addStateLabel(labelsGroup, state);
+    var label = NFAVisualizer.addStateLabel(state);
+    labelsGroup.appendChild(label);
   }
 
   for (var label in nfa.states) {
@@ -53,10 +54,14 @@ NFAVisualizer.visualize = function(selector, nfa) {
             c = NFAVisualizer.getCurveControlPoints(distance, f = f - 2, n);
           }
           var transition = SVG.create('path', { d: NFAVisualizer.generatePathDefinition(s, c, d), source: sl, destination: dl, symbol: symbol });
+          var label = NFAVisualizer.addTransitionLabel(s, c, symbol);
           transitionsGroup.appendChild(transition);
+          labelsGroup.appendChild(label);
         } else {
           var transition = SVG.create('path', { d: 'M' + s.x + ',' + s.y + ' L' + d.x + ',' + d.y, source: sl, destination: dl, symbol: symbol });
+          var label = NFAVisualizer.addTransitionLabel(s, { x1: 0, y1: 0, x2: distance, y2: 0 }, symbol);
           transitionsGroup.appendChild(transition);
+          labelsGroup.appendChild(label);
         }
       }
     }
@@ -88,12 +93,21 @@ NFAVisualizer.generatePathDefinition = function(source, control, destination) {
     + destination.x + ',' + destination.y;
 }
 
-NFAVisualizer.addStateLabel = function(group, state) {
+NFAVisualizer.addStateLabel = function(state) {
   var label = document.createElement('p');
   label.textContent = state.getAttribute('label');
   label.style.top = state.getAttribute('cy') + 'px';
   label.style.left = state.getAttribute('cx') + 'px';
-  group.appendChild(label);
+  return label;
+}
+
+NFAVisualizer.addTransitionLabel = function(source, control, symbol) {
+  var label = document.createElement('span');
+  label.textContent = symbol;
+  var top = source.y + control.y1 * 0.75;
+  label.style.top = top + (source.y >= top ? -5 : 5) + 'px';
+  label.style.left = source.x + (control.x1 + control.x2) / 2 + 'px';
+  return label;
 }
 
 
