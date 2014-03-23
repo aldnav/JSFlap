@@ -1,0 +1,31 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+#nfa {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+svg {
+  display: block;
+}
+
+circle {
+  stroke: #333333;
+  stroke-width: 2px;
+  fill: #ffffff;
+}
+
+path {
+  stroke: #333333;
+  stroke-width: 1px;
+  fill: none;
+}
