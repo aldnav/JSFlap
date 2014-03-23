@@ -51,6 +51,12 @@ NFAVisualizer.visualize = function(container, nfa) {
       }
     }
   }
+  var finalStates = nfa.finalStates();
+  for (i = 0; i < finalStates.length; i++) {
+    var coordinates = NFAVisualizer.getStateCoordinates(states[finalStates[i].label]);
+    var state = SVG.create('circle', { cx: coordinates.x, cy: coordinates.y, r: 6, class: 'final' });
+    statesGroup.appendChild(state);
+  }
 }
 
 NFAVisualizer.getStateCoordinates = function(state) {
