@@ -1,12 +1,20 @@
 function NFAVisualizer() {}
-NFAVisualizer.visualize = function(container, nfa) {
-  container = document.querySelector(container);
+NFAVisualizer.visualize = function(selector, nfa) {
+  var container = document.querySelector(selector);
   var width = getComputedStyle(container)['width'];
   var height = getComputedStyle(container)['height'];
   var svg = SVG.create('svg', { width: width, height: height });
   var transitionsGroup = SVG.create('g', { class: 'transitions' });
   var statesGroup = SVG.create('g', { class: 'states' });
+  var labelsGroup = document.createElement('div');
+  labelsGroup.setAttribute('class', 'labels');
+  labelsGroup.setAttribute('for', selector);
   container.appendChild(svg);
+  document.body.appendChild(labelsGroup);
+  labelsGroup.style.top = container.offsetTop + 'px';
+  labelsGroup.style.left = container.offsetLeft + 'px';
+  labelsGroup.style.width = width;
+  labelsGroup.style.height = height;
   svg.appendChild(transitionsGroup);
   svg.appendChild(statesGroup);
   width = svg.width.baseVal.value;
@@ -16,10 +24,12 @@ NFAVisualizer.visualize = function(container, nfa) {
   var interval = width / (nfa.stateCount + 1);
   var i = 1;
   for (var label in nfa.states) {
-    var state = SVG.create('circle', { cx: interval * i++, cy: height / 2, r: 10, label: label });
+    var state = SVG.create('circle', { cx: interval * i++, cy: height / 2, r: 12, label: label });
     states[label] = state;
     statesGroup.appendChild(state);
+    NFAVisualizer.addStateLabel(labelsGroup, state);
   }
+
   for (var label in nfa.states) {
     var source = states[label];
     var state = nfa.states[label];
@@ -51,11 +61,10 @@ NFAVisualizer.visualize = function(container, nfa) {
       }
     }
   }
+
   var finalStates = nfa.finalStates();
   for (i = 0; i < finalStates.length; i++) {
-    var coordinates = NFAVisualizer.getStateCoordinates(states[finalStates[i].label]);
-    var state = SVG.create('circle', { cx: coordinates.x, cy: coordinates.y, r: 6, class: 'final' });
-    statesGroup.appendChild(state);
+    states[finalStates[i].label].classList.add('final');
   }
 }
 
@@ -77,6 +86,14 @@ NFAVisualizer.generatePathDefinition = function(source, control, destination) {
     + ' C' + (source.x + control.x1) + ',' + (source.y + control.y1) + ' ' 
     + (source.x + control.x2) + ',' + (source.y + control.y2) + ' ' 
     + destination.x + ',' + destination.y;
+}
+
+NFAVisualizer.addStateLabel = function(group, state) {
+  var label = document.createElement('p');
+  label.textContent = state.getAttribute('label');
+  label.style.top = state.getAttribute('cy') + 'px';
+  label.style.left = state.getAttribute('cx') + 'px';
+  group.appendChild(label);
 }
 
 
