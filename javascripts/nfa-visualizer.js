@@ -6,6 +6,7 @@ NFAVisualizer.visualize = function(selector, nfa) {
   var svg = SVG.create('svg', { width: width, height: height });
   var transitionsGroup = SVG.create('g', { class: 'transitions' });
   var statesGroup = SVG.create('g', { class: 'states' });
+  var arrowHeadsGroup = SVG.create('g', { class: 'arrow-heads' });
   var labelsGroup = document.createElement('div');
   labelsGroup.setAttribute('class', 'labels');
   labelsGroup.setAttribute('for', selector);
@@ -17,6 +18,7 @@ NFAVisualizer.visualize = function(selector, nfa) {
   labelsGroup.style.height = height;
   svg.appendChild(transitionsGroup);
   svg.appendChild(statesGroup);
+  svg.appendChild(arrowHeadsGroup);
   width = svg.width.baseVal.value;
   height = svg.height.baseVal.value;
 
@@ -27,7 +29,7 @@ NFAVisualizer.visualize = function(selector, nfa) {
     var state = SVG.create('circle', { cx: interval * i++, cy: height / 2, r: 12, label: label });
     states[label] = state;
     statesGroup.appendChild(state);
-    var label = NFAVisualizer.addStateLabel(state);
+    var label = NFAVisualizer.getStateLabel(state);
     labelsGroup.appendChild(label);
   }
 
@@ -43,7 +45,7 @@ NFAVisualizer.visualize = function(selector, nfa) {
         var d = NFAVisualizer.getStateCoordinates(destination);
         var distance = Math.distance(s, d);
 
-        var f = 4;
+        var f = 3;
         var n = s.x < d.x ? 'r' : 'l';
         var c = NFAVisualizer.getCurveControlPoints(distance, f, n);
 
@@ -54,14 +56,19 @@ NFAVisualizer.visualize = function(selector, nfa) {
             c = NFAVisualizer.getCurveControlPoints(distance, f = f - 2, n);
           }
           var transition = SVG.create('path', { d: NFAVisualizer.generatePathDefinition(s, c, d), source: sl, destination: dl, symbol: symbol });
-          var label = NFAVisualizer.addTransitionLabel(s, c, symbol);
+          var label = NFAVisualizer.getTransitionLabel(s, c, symbol);
           transitionsGroup.appendChild(transition);
           labelsGroup.appendChild(label);
         } else {
           var transition = SVG.create('path', { d: 'M' + s.x + ',' + s.y + ' L' + d.x + ',' + d.y, source: sl, destination: dl, symbol: symbol });
-          var label = NFAVisualizer.addTransitionLabel(s, { x1: 0, y1: 0, x2: distance, y2: 0 }, symbol);
+          var label = NFAVisualizer.getTransitionLabel(s, { x1: 0, y1: 0, x2: distance, y2: 0 }, symbol);
+          var angle = Math.angle(d, s);
+          var origin = Math.coordinates(d, 12, angle);
+          var arrowHead = NFAVisualizer.getArrowHead(origin, angle);
           transitionsGroup.appendChild(transition);
           labelsGroup.appendChild(label);
+          arrowHeadsGroup.appendChild(arrowHead.left);
+          arrowHeadsGroup.appendChild(arrowHead.right);
         }
       }
     }
@@ -93,7 +100,7 @@ NFAVisualizer.generatePathDefinition = function(source, control, destination) {
     + destination.x + ',' + destination.y;
 }
 
-NFAVisualizer.addStateLabel = function(state) {
+NFAVisualizer.getStateLabel = function(state) {
   var label = document.createElement('p');
   label.textContent = state.getAttribute('label');
   label.style.top = state.getAttribute('cy') + 'px';
@@ -101,13 +108,21 @@ NFAVisualizer.addStateLabel = function(state) {
   return label;
 }
 
-NFAVisualizer.addTransitionLabel = function(source, control, symbol) {
+NFAVisualizer.getTransitionLabel = function(source, control, symbol) {
   var label = document.createElement('span');
   label.textContent = symbol;
   var top = source.y + control.y1 * 0.75;
   label.style.top = top + (source.y >= top ? -5 : 5) + 'px';
   label.style.left = source.x + (control.x1 + control.x2) / 2 + 'px';
   return label;
+}
+
+NFAVisualizer.getArrowHead = function(origin, angle) {
+  var left = Math.coordinates(origin, 6, angle + 25);
+  var right = Math.coordinates(origin, 6, angle - 25);
+  left = SVG.create('path', { d: 'M' + origin.x + ',' + origin.y + ' L' + left.x + ',' + left.y });
+  right = SVG.create('path', { d: 'M' + origin.x + ',' + origin.y + ' L' + right.x + ',' + right.y });
+  return { left: left, right: right };
 }
 
 
@@ -131,4 +146,24 @@ SVG.create = function(type, attributes) {
 
 Math.distance = function(p1, p2) {
   return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+}
+
+Math.angle = function(p1, p2) {
+  var angle = Math.atan((p2.y - p1.y) / (p2.x - p1.x));
+  angle *= 180 / Math.PI;
+  if (p2.x >= p1.x && p2.y < p1.y) {
+    angle =  -angle;
+  } else if (p2.x < p1.x && p2.y < p1.y || p2.x < p1.x && p2.y >= p1.y) {
+    angle = 180 - angle;
+  } else if (p2.x >= p1.x && p2.y >= p1.y) {
+    angle = 360 - angle;
+  }
+  return angle % 360;
+}
+
+Math.coordinates = function(origin, length, angle) {
+  angle *= Math.PI / 180;
+  var x = origin.x + Math.cos(angle) * length;
+  var y = origin.y - Math.sin(angle) * length;
+  return { x: x, y: y };
 }

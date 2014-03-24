@@ -1,3 +1,3 @@
-var regex = 'a*(a+b*)+(b*b+a*+b*a*)*';
+var regex = 'a*(a+b*a*)*+(b+a*b*)*';
 var nfa = RegexParser.parse(regex); 
 NFAVisualizer.visualize('#nfa', nfa);
