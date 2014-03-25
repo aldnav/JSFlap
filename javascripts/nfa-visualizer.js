@@ -71,8 +71,7 @@ NFAVisualizer.visualize = function(selector, nfa) {
           var arrowHead = NFAVisualizer.getArrowHead(origin, angle);
           transitionsGroup.appendChild(transition);
           labelsGroup.appendChild(label);
-          arrowHeadsGroup.appendChild(arrowHead.left);
-          arrowHeadsGroup.appendChild(arrowHead.right);
+          arrowHeadsGroup.appendChild(arrowHead);
           // NFAVisualizer.showCurveControlPoints(svg, points);
         } else {
           var transition = SVG.create('path', { d: 'M' + s.x + ',' + s.y + ' L' + d.x + ',' + d.y, source: sl, destination: dl, symbol: symbol });
@@ -82,12 +81,14 @@ NFAVisualizer.visualize = function(selector, nfa) {
           var arrowHead = NFAVisualizer.getArrowHead(origin, angle);
           transitionsGroup.appendChild(transition);
           labelsGroup.appendChild(label);
-          arrowHeadsGroup.appendChild(arrowHead.left);
-          arrowHeadsGroup.appendChild(arrowHead.right);
+          arrowHeadsGroup.appendChild(arrowHead);
         }
       }
     }
   }
+
+  var indicator = NFAVisualizer.getStartStateIndicator(states[nfa.startState().label]);
+  svg.appendChild(indicator);
 
   var finalStates = nfa.finalStates();
   for (i = 0; i < finalStates.length; i++) {
@@ -133,11 +134,17 @@ NFAVisualizer.getTransitionLabel = function(source, control, symbol) {
 }
 
 NFAVisualizer.getArrowHead = function(origin, angle) {
-  var left = Math.coordinates(origin, 6, angle + 25);
-  var right = Math.coordinates(origin, 6, angle - 25);
-  left = SVG.create('path', { d: 'M' + origin.x + ',' + origin.y + ' L' + left.x + ',' + left.y });
-  right = SVG.create('path', { d: 'M' + origin.x + ',' + origin.y + ' L' + right.x + ',' + right.y });
-  return { left: left, right: right };
+  var e1 = Math.coordinates(origin, 6, angle + 25);
+  var e2 = Math.coordinates(origin, 6, angle - 25);
+  return SVG.create('path', { d: 'M' + e1.x + ',' + e1.y + ' L' + origin.x + ',' + origin.y + ' ' + e2.x + ',' + e2.y });
+}
+
+NFAVisualizer.getStartStateIndicator = function(state) {
+  var cx = parseInt(state.getAttribute('cx')) - 12;
+  var cy = parseInt(state.getAttribute('cy'));
+  var e1 = Math.coordinates({ x: cx, y: cy }, 10, 180 - 45);
+  var e2 = Math.coordinates({ x: cx, y: cy }, 10, 180 + 45);
+  return SVG.create('path', { d: 'M' + e1.x + ',' + e1.y + ' L' + cx + ',' + cy + ' ' + e2.x + ',' + e2.y, class: 'indicator' });
 }
 
 NFAVisualizer.showCurveControlPoints = function(svg, points) {

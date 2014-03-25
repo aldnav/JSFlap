@@ -55,3 +55,7 @@ path {
 path.control {
   stroke: #aa0000;
 }
+
+path.indicator {
+  stroke-width: 2px;
+}
