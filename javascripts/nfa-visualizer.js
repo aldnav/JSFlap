@@ -55,12 +55,28 @@ NFAVisualizer.visualize = function(selector, nfa) {
           while (document.querySelector('path[d="' + NFAVisualizer.generatePathDefinition(s, c, d) + '"]') && f > 0) {
             c = NFAVisualizer.getCurveControlPoints(distance, f = f - 2, n);
           }
-          var transition = SVG.create('path', { d: NFAVisualizer.generatePathDefinition(s, c, d), source: sl, destination: dl, symbol: symbol });
+          var points = JSON.stringify({ sx: s.x, sy: s.y, p1x: s.x + c.x1, p1y: s.y + c.y1, p2x: s.x + c.x2, p2y: s.y + c.y2, dx: d.x, dy: d.y });
+          var transition = SVG.create('path', { d: NFAVisualizer.generatePathDefinition(s, c, d), source: sl, destination: dl, symbol: symbol, points: points });
           var label = NFAVisualizer.getTransitionLabel(s, c, symbol);
+          var control = { x: s.x + c.x2, y: s.y + c.y2 };
+          if (distance < interval * 1.5) {
+            var controlDistance = Math.distance({ x: s.x + c.x1, y: s.y + c.y1 }, { x: s.x + c.x2, y: s.y + c.y2 });
+            control.x = s.x + c.x1 + controlDistance * (s.x < d.x ? 0.75 : -0.75);
+          }
+          var angle = Math.angle(d, control);
+          if (distance > interval * 2 && distance < interval * 6) {
+            angle += 3;
+          }
+          var origin = Math.coordinates(d, 12, angle);
+          var arrowHead = NFAVisualizer.getArrowHead(origin, angle);
           transitionsGroup.appendChild(transition);
           labelsGroup.appendChild(label);
+          arrowHeadsGroup.appendChild(arrowHead.left);
+          arrowHeadsGroup.appendChild(arrowHead.right);
+          // NFAVisualizer.showCurveControlPoints(svg, points);
         } else {
-          var transition = SVG.create('path', { d: 'M' + s.x + ',' + s.y + ' L' + d.x + ',' + d.y, source: sl, destination: dl, symbol: symbol });
+          var points = JSON.stringify({ sx: s.x, sy: s.y, dx: d.x, dy: d.y });
+          var transition = SVG.create('path', { d: 'M' + s.x + ',' + s.y + ' L' + d.x + ',' + d.y, source: sl, destination: dl, symbol: symbol, points: points });
           var label = NFAVisualizer.getTransitionLabel(s, { x1: 0, y1: 0, x2: distance, y2: 0 }, symbol);
           var angle = Math.angle(d, s);
           var origin = Math.coordinates(d, 12, angle);
@@ -123,6 +139,41 @@ NFAVisualizer.getArrowHead = function(origin, angle) {
   left = SVG.create('path', { d: 'M' + origin.x + ',' + origin.y + ' L' + left.x + ',' + left.y });
   right = SVG.create('path', { d: 'M' + origin.x + ',' + origin.y + ' L' + right.x + ',' + right.y });
   return { left: left, right: right };
+}
+
+NFAVisualizer.showCurveControlPoints = function(svg, points) {
+  points = JSON.parse(points);
+  var c1 = SVG.create('circle', { cx: points.p1x, cy: points.p1y, r: 1, class: 'control' });
+  var c2 = SVG.create('circle', { cx: points.p2x, cy: points.p2y, r: 1, class: 'control' });
+  var l1 = SVG.create('path', { d: 'M' + points.sx + ',' + points.sy + ' L' + points.p1x + ',' + points.p1y, class: 'control' });
+  var l2 = SVG.create('path', { d: 'M' + points.dx + ',' + points.dy + ' L' + points.p2x + ',' + points.p2y, class: 'control' });
+  var l3 = SVG.create('path', { d: 'M' + points.p1x + ',' + points.p1y + ' L' + points.p2x + ',' + points.p2y, class: 'control' });
+  var d1 = Math.distance({ x: points.sx, y: points.sy }, { x: points.p1x, y: points.p1y });
+  var a1 = Math.angle({ x: points.sx, y: points.sy }, { x: points.p1x, y: points.p1y });
+  var m1 = Math.coordinates({ x: points.sx, y: points.sy }, d1 / 2, a1);
+  var c3 = SVG.create('circle', { cx: m1.x, cy: m1.y, r: 1, class: 'control' });
+  var d2 = Math.distance({ x: points.dx, y: points.dy }, { x: points.p2x, y: points.p2y });
+  var a2 = Math.angle({ x: points.dx, y: points.dy }, { x: points.p2x, y: points.p2y });
+  var m2 = Math.coordinates({ x: points.dx, y: points.dy }, d2 / 2, a2);
+  var c4 = SVG.create('circle', { cx: m2.x, cy: m2.y, r: 1, class: 'control' });
+  var c5 = SVG.create('circle', { cx: (points.p1x + points.p2x) / 2, cy: points.p1y, r: 1, class: 'control' });
+  var l4 = SVG.create('path', { d: 'M' + m1.x + ',' + m1.y + ' L' + (points.p1x + points.p2x) / 2 + ',' + points.p2y, class: 'control' });
+  var l5 = SVG.create('path', { d: 'M' + m2.x + ',' + m2.y + ' L' + (points.p1x + points.p2x) / 2 + ',' + points.p2y, class: 'control' });
+  var d3 = Math.distance({ x: points.p1x, y: points.p1y }, { x: points.p2x, y: points.p2y });
+  var c6 = SVG.create('circle', { cx: points.p1x + d3 * (points.sx < points.dx ? 0.75 : -0.75), cy: points.p1y, r: 1, class: 'control' });
+  var l6 = SVG.create('path', { d: 'M' + (points.p1x + d3 * (points.sx < points.dx ? 0.75 : -0.75)) + ',' + points.p1y + ' L' + points.dx + ',' + points.dy, class: 'control' });
+  svg.appendChild(c1);
+  svg.appendChild(c2);
+  svg.appendChild(l1);
+  svg.appendChild(l2);
+  svg.appendChild(l3);
+  svg.appendChild(c3);
+  svg.appendChild(c4);
+  svg.appendChild(c5);
+  svg.appendChild(l4);
+  svg.appendChild(l5);
+  svg.appendChild(c6);
+  svg.appendChild(l6);
 }
 
 

@@ -40,8 +40,18 @@ circle.final {
   stroke-width: 4px;
 }
 
+circle.control {
+  stroke: #aa0000;
+  stroke-width: 2px;
+  fill: #aa0000;
+}
+
 path {
   stroke: #333333;
   stroke-width: 1px;
   fill: none;
+}
+
+path.control {
+  stroke: #aa0000;
 }
