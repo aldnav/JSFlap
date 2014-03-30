@@ -1,16 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <link rel="stylesheet" href="stylesheets/application.css">
-  <title>NFA Visualizer</title>
+  <title></title>
+  <style type="text/css">
+    svg {
+      border: 1px solid black;
+    }
+    circle {
+      stroke-width: 1;
+      cursor: move;
+      transition: all 0.5s ease;
+    }
+    circle:hover {
+      stroke-width: 3;
+      fill: yellow;
+    }
+    circle:active {
+      fill: green;
+    }
+  </style>
 </head>
-
 <body>
-  <div id="nfa"></div>
-
-  <script src="javascripts/regex2nfa.js"></script>
-  <script src="javascripts/nfa-visualizer.js"></script>
-  <script src="javascripts/application.js"></script>
+  <svg width="960" height="640">
+    <!-- <circle id="q0" cx="288" cy="172" r="10" stroke="black" stroke-width="1" fill="white"></circle> -->
+  </svg>
+  <div>x:<span id="x"></span></div>
+  <div>y:<span id="y"></span></div>
+  <script type="text/javascript" src="assets/js/jquery.min.js"></script>
+  <script type="text/javascript" src="assets/js/visualizer.js"></script>
+  <script>
+    $(document).mousemove(function(e) {
+      $('#x').html(e.pageX);
+      $('#y').html(e.pageY);
+    });
+  </script>
 </body>
 </html>
