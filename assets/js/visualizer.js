@@ -9,8 +9,8 @@ $(document).ready( function(){
 	selected = null;
 	openState = null;
 
-	$(document).on('contextmenu', 'circle', function(e){
-		alert('Context Menu event has fired!');
+	$(document).on('contextmenu', SVG, function(e){
+		// alert('Context Menu event has fired!');
 		return false;
 	});
 
@@ -19,7 +19,7 @@ $(document).ready( function(){
 	});
 
 	SVG.on('mouseup', 'g',  function(e){
-		if (selected != null) {
+		if (selected != null && e.which != 3) {
 			x = e.pageX - off_left;
 			y = e.pageY - off_top;
 
@@ -37,7 +37,7 @@ $(document).ready( function(){
 	});
 
 	SVG.on('mousemove', SVG, function(e){
-		if (selected != null) {
+		if (selected != null && e.which != 3) {
 			x = e.pageX - off_left;
 			y = e.pageY - off_top;
 			selected.find('text').attr({
@@ -49,7 +49,7 @@ $(document).ready( function(){
 	});
 
 	SVG.on('mouseup', function(e){
-		if (selected != null) {
+		if (selected != null && e.which != 3) {
 			x = e.pageX - off_left;
 			y = e.pageY - off_top;
 			selected.find('text').attr({
@@ -62,7 +62,7 @@ $(document).ready( function(){
 	});
 
 	SVG.on('mousedown', function(e){
-		if (selected == null) {
+		if (selected == null && e.which != 3) {
 			x = e.pageX - off_left;
 			y = e.pageY - off_top;
 
@@ -84,7 +84,7 @@ $(document).ready( function(){
 	});
 
 	SVG.on('mousemove', SVG, function(e){
-		if (openState != null) {
+		if (openState != null  && e.which != 3) {
 			openState.find('line').attr({'x2': e.pageX - off_left, 'y2': e.pageY - off_top});
 		}
 	});
