@@ -1,6 +1,8 @@
 $(document).ready( function(){
 
 	SVG = $('svg');
+	gCtxMenu = $('#gContextMenu');
+	gCtxMenuLi = $('#gContextMenu li');
 	off_top = SVG.offset().top;
 	off_left = SVG.offset().left;
 	x = 0;
@@ -16,10 +18,29 @@ $(document).ready( function(){
 
 	SVG.on('mousedown', 'g', function(e){
 		selected = $(this);
+		if (e.which == 3) {
+			showContextMenu(e);
+		} else {
+			hideContextMenu();
+		}
 	});
 
+	function showContextMenu(e) {
+		gCtxMenu.css("top", e.pageY);
+		gCtxMenu.css("left", e.pageX);
+		gCtxMenu.show();
+	}
+
+	function hideContextMenu(){
+		gCtxMenu.hide();
+	}
+
+	function contextMenuHidden() {
+		return gCtxMenu.is(":hidden");
+	}
+
 	SVG.on('mouseup', 'g',  function(e){
-		if (selected != null && e.which != 3) {
+		if (selected != null && e.which != 3) {			
 			x = e.pageX - off_left;
 			y = e.pageY - off_top;
 
@@ -37,7 +58,7 @@ $(document).ready( function(){
 	});
 
 	SVG.on('mousemove', SVG, function(e){
-		if (selected != null && e.which != 3) {
+		if (selected != null && e.which != 3 && contextMenuHidden()) {
 			x = e.pageX - off_left;
 			y = e.pageY - off_top;
 			selected.find('text').attr({
@@ -61,8 +82,13 @@ $(document).ready( function(){
 		selected = null;
 	});
 
-	SVG.on('mousedown', function(e){
-		if (selected == null && e.which != 3) {
+	SVG.on('mousedown', function(e){		
+		if (selected == null) {
+			if (e.which != 3) {
+				hideContextMenu();
+			} else {
+				return;
+			}
 			x = e.pageX - off_left;
 			y = e.pageY - off_top;
 
@@ -79,7 +105,13 @@ $(document).ready( function(){
 			textWidth = $('#q'+count+' text').width()/2;
 			textHeight = $('#q'+count+' text').height()/4;
 			$('#q'+count+' text').attr({'x': x - textWidth, 'y': y + textHeight});
-			count++;	
+			count++;
+		} else {
+			if (e.which != 3) {
+				hideContextMenu();
+			} else {
+				return;
+			}
 		}
 	});
 
@@ -88,4 +120,9 @@ $(document).ready( function(){
 			openState.find('line').attr({'x2': e.pageX - off_left, 'y2': e.pageY - off_top});
 		}
 	});
+
+	gCtxMenuLi.click(function(e){
+		gCtxMenu.hide();
+	});
+
 });
