@@ -6,23 +6,31 @@
     svg {
       border: 1px solid black;
     }
-    circle {
-      stroke-width: 1;
+    g {
       cursor: move;
       transition: all 0.5s ease;
     }
-    circle:hover {
+    g:hover circle, g:hover text {
       stroke-width: 3;
       fill: yellow;
     }
-    circle:active {
+    g:active {
       fill: green;
+    }
+    text {
+      cursor: move;
+      font: 2em normal 'Trajan Pro';
+      -webkit-user-select: none;
+    }
+    circle:active {
+      text-shadow: 0 0 3px;
     }
   </style>
 </head>
 <body>
-  <svg width="960" height="640">
+  <svg width="100%" height="600">
     <!-- <circle id="q0" cx="288" cy="172" r="10" stroke="black" stroke-width="1" fill="white"></circle> -->
+    <line x1="0" y1="0" x2="200" y2="100" style="stroke:red;stroke-width:2" value="Yes"/>
   </svg>
   <div>x:<span id="x"></span></div>
   <div>y:<span id="y"></span></div>
