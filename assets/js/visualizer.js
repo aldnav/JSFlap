@@ -10,23 +10,29 @@ $(document).ready( function(){
 	openState = null;
 
 	$(document).on('contextmenu', 'circle', function(e){
-		e.preventDefault();
-	   alert('Context Menu event has fired!');
-	   return false;
+		alert('Context Menu event has fired!');
+		return false;
 	});
 
 	SVG.on('mousedown', 'g', function(e){
 		selected = $(this);
-		console.log(e.which);
 	});
 
 	SVG.on('mouseup', 'g',  function(e){
 		if (selected != null) {
-			if (openState != null) {
+			x = e.pageX - off_left;
+			y = e.pageY - off_top;
 
+			if (openState == null) {
+				openState = $(this);
+				openState.prepend(
+					$(document.createElementNS('http://www.w3.org/2000/svg', 'line')).attr(
+						{'x1': x, 'y1': y, 'stroke': 'red', 'stroke-width': 2})
+				);
+			} else {
+				openState.find('line').attr({'x2': x, 'y2': y});
+				openState = null;
 			}
-			openState = $(this);
-			$('line').attr({'x1': e.pageX - off_left, 'y1': e.pageY - off_top});
 		}
 	});
 
@@ -78,6 +84,8 @@ $(document).ready( function(){
 	});
 
 	SVG.on('mousemove', SVG, function(e){
-		$('line').attr({'x2': e.pageX - off_left, 'y2': e.pageY - off_top});
+		if (openState != null) {
+			openState.find('line').attr({'x2': e.pageX - off_left, 'y2': e.pageY - off_top});
+		}
 	});
 });
