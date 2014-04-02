@@ -2,7 +2,6 @@ $(document).ready( function(){
 
 	SVG = $('svg');
 	gCtxMenu = $('#gContextMenu');
-	gCtxMenuLi = $('#gContextMenu li');
 	off_top = SVG.offset().top;
 	off_left = SVG.offset().left;
 	x = 0;
@@ -102,6 +101,13 @@ $(document).ready( function(){
 					{'x': x, 'y': y, 'stroke': 'black', 'fill': 'black'}).html('Q'+count)
 			);
 
+			SVG.append(function(){
+				$(document.createElementNS('http://www.w3.org/2000/svg', 'animate')).attr(
+					{'attributeName': 'r', 'from': 0, 'to': 30, 'dur': '3s'});
+				$(document.createElementNS('http://www.w3.org/2000/svg', 'animate')).attr(
+					{'attributeName': 'stroke-width', 'from': 0, 'to': 10, 'dur': '3s'});
+			});
+
 			textWidth = $('#q'+count+' text').width()/2;
 			textHeight = $('#q'+count+' text').height()/4;
 			$('#q'+count+' text').attr({'x': x - textWidth, 'y': y + textHeight});
@@ -119,10 +125,6 @@ $(document).ready( function(){
 		if (openState != null  && e.which != 3) {
 			openState.find('line').attr({'x2': e.pageX - off_left, 'y2': e.pageY - off_top});
 		}
-	});
-
-	gCtxMenuLi.click(function(e){
-		gCtxMenu.hide();
 	});
 
 });
