@@ -32,16 +32,15 @@
       top: 0;
       left: 0;
       background-color: rgba(255,255,255,0.4);
-      box-shadow: 0 0 3px #333;
+      box-shadow: 0 0 2px #333;
       z-index: 1;
+      border-radius: 2px;
     }
-    .menu ul {
+    .menu form {
       margin-left: 0em;
-      padding: 0 0.5em;      
+      padding: 1em 0.5em;      
     }
-    .menu li {
-      display: block;
-      list-style: none;
+    .menu input {
       cursor: pointer;
     }
   </style>
@@ -52,10 +51,10 @@
     <line x1="0" y1="0" x2="200" y2="100" style="stroke:red;stroke-width:2" value="Yes"/>
   </svg>
   <div class="menu" id="gContextMenu">
-    <ul>
-      <li>Set as the start state</li>
-      <li>Set as a final state</li>
-    </ul>
+    <form>
+      <input type="checkbox" name="vehicle" value="start">Start State<br>
+      <input type="checkbox" name="vehicle" value="final">Final State<br>
+    </form>
   </div>
   <div>x:<span id="x"></span></div>
   <div>y:<span id="y"></span></div>
